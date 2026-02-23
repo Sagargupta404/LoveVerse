@@ -1,0 +1,155 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { FaHeart, FaMusic } from "react-icons/fa";
+import Particles from "react-tsparticles";
+import { loadFull } from "tsparticles";
+import LoveWordDance from "@/components/LoveWordDance";
+import { useRouter } from "next/navigation";
+
+export default function Hero() {
+  const text = "Where two souls meet, destiny begins...";
+  const [displayedText, setDisplayedText] = useState("");
+  const [musicOn, setMusicOn] = useState(false);
+  const [dance, setDance] = useState(false);
+  const audioRef = useRef(null);
+  const router = useRouter();
+
+
+useEffect(() => {
+  fetch("/api/couples/getAll")
+    .then(res => res.json())
+    .then(data => setCouples(data));
+}, []);
+  // Typewriter Effect
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayedText(text.slice(0, i));
+      i++;
+      if (i > text.length) clearInterval(interval);
+    }, 60);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Music Toggle
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+
+    if (musicOn) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setMusicOn(!musicOn);
+  };
+
+  const particlesInit = async (main) => {
+    await loadFull(main);
+  };
+
+  // Scroll Click Handler
+  const handleScrollClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setDance(true);
+
+    // Auto return after 8 seconds
+    setTimeout(() => {
+      setDance(false);
+    }, 8000);
+  };
+
+  return (
+    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black text-white">
+
+      {/* Star Particles */}
+      <Particles
+        id="tsparticles"
+        init={particlesInit}
+        options={{
+          background: { color: "transparent" },
+          particles: {
+            number: { value: 80 },
+            size: { value: 2 },
+            move: { enable: true, speed: 0.3 },
+            opacity: { value: 0.5 },
+          },
+        }}
+        className="absolute inset-0"
+      />
+
+      {/* Romantic Glow */}
+      <div className="absolute w-[700px] h-[700px] bg-pink-600 rounded-full blur-[250px] opacity-20"></div>
+
+      {/* MAIN CONTENT (Hidden when dance = true) */}
+      {!dance && (
+        <div className="z-10 text-center px-6">
+
+          <motion.h1
+            initial={{ opacity: 0, y: -60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5 }}
+            className="text-6xl md:text-8xl font-extrabold bg-gradient-to-r from-pink-400 via-red-500 to-purple-500 text-transparent bg-clip-text"
+          >
+            LoveVerse
+          </motion.h1>
+
+          
+
+          <p className="mt-6 text-xl md:text-2xl text-gray-300 min-h-[40px]">
+            {displayedText}
+          </p>
+
+          {/* Beating Heart */}
+          <motion.div
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ repeat: Infinity, duration: 1.2 }}
+            className="flex justify-center mt-10"
+          >
+            <FaHeart className="text-pink-500 text-7xl drop-shadow-[0_0_40px_rgba(255,0,128,0.8)]" />
+          </motion.div>
+
+          {/* Buttons */}
+          <div className="mt-10 flex justify-center gap-6">
+
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              onClick={() => router.push("/journey")}
+              className="px-10 py-4 border border-pink-500 rounded-full hover:bg-pink-500 hover:shadow-[0_0_40px_rgba(255,0,128,0.6)] transition-all duration-500"
+            >
+              Begin the Journey ❤️
+            </motion.button>
+
+            <button
+              onClick={toggleMusic}
+              className="px-6 py-4 border border-white rounded-full hover:bg-white hover:text-black transition-all"
+            >
+              <FaMusic />
+            </button>
+          </div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            onClick={handleScrollClick}
+            animate={{ y: [0, 15, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="mt-20 text-gray-400 cursor-pointer hover:text-pink-400 transition"
+          >
+            ↓ Scroll to Explore
+          </motion.div>
+
+        </div>
+      )}
+
+      {/* Floating Love Words */}
+      {dance && <LoveWordDance trigger={dance} />}
+
+      {/* Audio */}
+      <audio ref={audioRef} loop>
+        <source src="/music/r1.mpeg" type="audio/mpeg" />
+      </audio>
+
+    </section>
+  );
+}
