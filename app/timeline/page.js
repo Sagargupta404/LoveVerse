@@ -14,18 +14,36 @@ const defaultSteps = [
   { key: "anniversary", label: "Anniversary" },
 ];
 
+// ✅ DATE DATA
+const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+const months = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
+
+const years = Array.from({ length: 35 }, (_, i) => 1996 + i);
+
 export default function LoveStoryPage() {
   const router = useRouter();
 
   const [events, setEvents] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [tempDate, setTempDate] = useState("");
+
+  // ✅ NEW STATES
+  const [day, setDay] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+
   const [finished, setFinished] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [customTitle, setCustomTitle] = useState("");
-  const [customDate, setCustomDate] = useState("");
 
-  // 🎆 CONFETTI BLAST FUNCTION
+  const [customDay, setCustomDay] = useState("");
+  const [customMonth, setCustomMonth] = useState("");
+  const [customYear, setCustomYear] = useState("");
+
+  // 🎆 CONFETTI
   const triggerBlast = () => {
     const duration = 1200;
     const end = Date.now() + duration;
@@ -48,39 +66,65 @@ export default function LoveStoryPage() {
     }, 200);
   };
 
+  // ✅ FORMAT DATE
+  const getOrdinal = (n) => {
+    if (n > 3 && n < 21) return "th";
+    switch (n % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
+
+  const formatDate = (d, m, y) => {
+    if (!d || !m || !y) return "";
+    return `${d}${getOrdinal(d)} ${m} ${y}`;
+  };
+
   const handleNext = () => {
-    if (!tempDate) return;
+    if (!day || !month || !year) return;
 
     const newEvent = {
       title: defaultSteps[currentStep].label,
-      date: tempDate,
+      date: formatDate(day, month, year),
     };
 
     const updated = [...events, newEvent];
     setEvents(updated);
-    setTempDate("");
+
+    setDay("");
+    setMonth("");
+    setYear("");
 
     if (currentStep + 1 < defaultSteps.length) {
       setCurrentStep(currentStep + 1);
     } else {
       setFinished(true);
-      setTimeout(() => {
-        triggerBlast(); // 🎆 Blast when full story completes
-      }, 400);
+      setTimeout(triggerBlast, 400);
     }
   };
 
   const addCustomEvent = () => {
-    if (!customTitle || !customDate) return;
+    if (!customTitle || !customDay || !customMonth || !customYear) return;
 
-    const updated = [...events, { title: customTitle, date: customDate }];
+    const updated = [
+      ...events,
+      {
+        title: customTitle,
+        date: formatDate(customDay, customMonth, customYear),
+      },
+    ];
+
     setEvents(updated);
 
     setCustomTitle("");
-    setCustomDate("");
+    setCustomDay("");
+    setCustomMonth("");
+    setCustomYear("");
     setShowAdd(false);
 
-    triggerBlast(); // 🎆 Blast when new memory added
+    triggerBlast();
   };
 
   const getLine = (title) => {
@@ -104,10 +148,12 @@ export default function LoveStoryPage() {
     return "A beautiful chapter in your love story.";
   };
 
+  const progress = (events.length / defaultSteps.length) * 100;
+
   return (
     <div className="min-h-screen bg-black text-white px-8 py-20">
 
-      {/* Back Button */}
+      {/* BACK BUTTON */}
       <button
         onClick={() => router.push("/journey")}
         className="fixed top-6 left-6 flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition"
@@ -115,6 +161,14 @@ export default function LoveStoryPage() {
         <FaArrowLeft />
         Back
       </button>
+
+      {/* PROGRESS BAR */}
+      <div className="fixed top-0 left-0 w-full h-2 bg-white/10">
+        <div
+          className="h-full bg-pink-500 transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
 
       {!finished ? (
         <div className="flex flex-col items-center justify-center min-h-screen text-center max-w-lg mx-auto">
@@ -125,12 +179,49 @@ export default function LoveStoryPage() {
             {defaultSteps[currentStep].label}
           </h2>
 
-          <input
-            type="date"
-            value={tempDate}
-            onChange={(e) => setTempDate(e.target.value)}
-            className="bg-white/10 border border-white/20 p-4 rounded-xl text-center mb-6"
-          />
+          {/* ✅ NEW SELECT INPUT */}
+          <div className="flex gap-4 mb-6">
+
+  <select
+    value={day}
+    onChange={(e) => setDay(Number(e.target.value))}
+    className="bg-white/10 text-white p-3 rounded-lg border border-white/20"
+  >
+    <option value="" className="text-black">Day</option>
+    {days.map(d => (
+      <option key={d} value={d} className="text-black">
+        {d}
+      </option>
+    ))}
+  </select>
+
+  <select
+    value={month}
+    onChange={(e) => setMonth(e.target.value)}
+    className="bg-white/10 text-white p-3 rounded-lg border border-white/20"
+  >
+    <option value="" className="text-black">Month</option>
+    {months.map(m => (
+      <option key={m} value={m} className="text-black">
+        {m}
+      </option>
+    ))}
+  </select>
+
+  <select
+    value={year}
+    onChange={(e) => setYear(Number(e.target.value))}
+    className="bg-white/10 text-white p-3 rounded-lg border border-white/20"
+  >
+    <option value="" className="text-black">Year</option>
+    {years.map(y => (
+      <option key={y} value={y} className="text-black">
+        {y}
+      </option>
+    ))}
+  </select>
+
+</div>
 
           <button
             onClick={handleNext}
@@ -154,14 +245,14 @@ export default function LoveStoryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
               className="border-b border-white/10 pb-20 cursor-pointer"
-              onClick={triggerBlast} // 🎆 Blast when clicking ANY topic
+              onClick={triggerBlast}
             >
               <div className="grid md:grid-cols-2 gap-10 items-center">
 
                 {index % 2 === 0 ? (
                   <>
                     <div>
-                      <h2 className="text-6xl font-bold uppercase tracking-wide flex items-center gap-4">
+                      <h2 className="text-4xl md:text-6xl font-bold flex items-center gap-4">
                         {event.title}
                         <FaHeart className="text-pink-500" />
                       </h2>
@@ -171,18 +262,18 @@ export default function LoveStoryPage() {
                       </p>
                     </div>
 
-                    <h3 className="text-5xl text-pink-400 font-semibold text-right">
+                    <h3 className="text-4xl md:text-6xl text-pink-400 text-right">
                       {event.date}
                     </h3>
                   </>
                 ) : (
                   <>
-                    <h3 className="text-5xl text-pink-400 font-semibold">
+                    <h3 className="text-4xl md:text-6xl text-pink-400">
                       {event.date}
                     </h3>
 
                     <div className="text-right">
-                      <h2 className="text-6xl font-bold uppercase tracking-wide flex items-center justify-end gap-4">
+                      <h2 className="text-4xl md:text-6xl font-bold flex justify-end gap-4">
                         <FaHeart className="text-pink-500" />
                         {event.title}
                       </h2>
@@ -198,7 +289,7 @@ export default function LoveStoryPage() {
             </motion.div>
           ))}
 
-          {/* Add More Section */}
+          {/* ✅ ADD FEATURE (UNCHANGED STYLE) */}
           <div className="pt-10 text-center">
 
             {!showAdd ? (
@@ -209,11 +300,8 @@ export default function LoveStoryPage() {
                 ❤️ Add Another Beautiful Moment
               </button>
             ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="max-w-md mx-auto mt-8 space-y-4"
-              >
+              <div className="max-w-md mx-auto mt-8 space-y-4">
+
                 <input
                   type="text"
                   placeholder="Moment Title"
@@ -222,12 +310,27 @@ export default function LoveStoryPage() {
                   className="w-full p-3 bg-white/10 border border-white/20 rounded-lg"
                 />
 
-                <input
-                  type="date"
-                  value={customDate}
-                  onChange={(e) => setCustomDate(e.target.value)}
-                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg"
-                />
+                <div className="flex gap-3">
+
+                  <select onChange={(e) => setCustomDay(Number(e.target.value))}
+                    className="bg-white/10 text-white p-2 rounded">
+                    <option>Day</option>
+                    {days.map(d => <option key={d}>{d}</option>)}
+                  </select>
+
+                  <select onChange={(e) => setCustomMonth(e.target.value)}
+                    className="bg-white/10 text-white p-2 rounded">
+                    <option>Month</option>
+                    {months.map(m => <option key={m}>{m}</option>)}
+                  </select>
+
+                  <select onChange={(e) => setCustomYear(Number(e.target.value))}
+                    className="bg-white/10 text-white p-2 rounded">
+                    <option>Year</option>
+                    {years.map(y => <option key={y}>{y}</option>)}
+                  </select>
+
+                </div>
 
                 <button
                   onClick={addCustomEvent}
@@ -235,7 +338,8 @@ export default function LoveStoryPage() {
                 >
                   Save Moment ❤️
                 </button>
-              </motion.div>
+
+              </div>
             )}
 
           </div>

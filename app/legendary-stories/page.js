@@ -203,10 +203,9 @@ export default function LegendaryStories() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-6"
           >
-            <div className="w-full max-w-6xl h-[80vh] bg-[#140a0f] rounded-3xl flex overflow-hidden">
-
+            <div className="w-full max-w-6xl h-[90vh] md:h-[80vh] bg-[#140a0f] rounded-3xl flex flex-col md:flex-row overflow-hidden">
               <div
-                className="w-1/2"
+                className="w-full md:w-1/2 h-48 md:h-full"
                 style={{
                   backgroundImage: `url(${selected.image})`,
                   backgroundSize: "cover",
@@ -214,28 +213,27 @@ export default function LegendaryStories() {
                 }}
               />
 
-              <div className="w-1/2 p-10 overflow-y-auto relative">
+              <div className="w-full md:w-1/2 p-5 md:p-10 overflow-y-auto relative">
 
                 <button
                   onClick={() => setSelected(null)}
-                  className="absolute top-6 right-6 text-xl"
+                  className="absolute top-3 right-3 md:top-6 md:right-6 text-xl"
                 >
                   <FaTimes />
                 </button>
 
-                <h2 className="text-5xl font-bold text-pink-400 mb-6">
+                <h2 className="text-2xl md:text-5xl font-bold text-pink-400 mb-4 md:mb-6">
                   {selected.name}
                 </h2>
 
-                <p className="text-xl text-gray-300 leading-relaxed mb-6">
+               <p className="text-base md:text-xl text-gray-300 leading-relaxed mb-4 md:mb-6">
                   {selected.story}
                 </p>
 
-                <p className="text-xl text-pink-300 mb-6">
+                <p className="text-base md:text-xl text-gray-400 space-y-2">
                   {selected.learning}
                 </p>
-
-                <ul className="text-xl text-gray-400 space-y-2">
+<ul className="text-base md:text-xl text-gray-400 space-y-2">
                   {selected.reflections.map((q, i) => (
                     <li key={i}>• {q}</li>
                   ))}
