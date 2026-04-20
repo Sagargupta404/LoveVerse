@@ -187,13 +187,25 @@ const handlePinSubmit = async () => {
 </div>
 
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              onClick={() => router.push("/journey")}
-              className="px-10 py-4 border border-pink-500 rounded-full hover:bg-pink-500 hover:shadow-[0_0_40px_rgba(255,0,128,0.6)] transition-all duration-500"
-            >
-              Begin the Journey ❤️
-            </motion.button>
+  whileHover={{ scale: 1.1 }}
+  onClick={() => router.push("/journey")}
+  className="
+    px-4 py-2 
+    md:px-10 md:py-4
 
+    text-sm md:text-base
+
+    border border-pink-500 
+    rounded-full
+
+    hover:bg-pink-500 
+    hover:shadow-[0_0_40px_rgba(255,0,128,0.6)] 
+
+    transition-all duration-500
+  "
+>
+  Begin the Journey ❤️
+</motion.button>
 
             <button
               onClick={toggleMusic}
